@@ -1,0 +1,55 @@
+name: analytics-service
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "services/analytics/**"
+      - ".github/workflows/analytics.yml"
+
+env:
+  AWS_REGION: af-south-1
+  ECR_REPOSITORY: ihp-analytics
+  EKS_CLUSTER_NAME: ihp-dev
+  SERVICE_DIR: services/analytics
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write # for OIDC auth to AWS — no long-lived keys in the repo
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to ECR
+        id: ecr-login
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push image
+        id: build
+        env:
+          REGISTRY: ${{ steps.ecr-login.outputs.registry }}
+        run: |
+          IMAGE_URI="$REGISTRY/${{ env.ECR_REPOSITORY }}:${{ github.sha }}"
+          docker build -t "$IMAGE_URI" "${{ env.SERVICE_DIR }}"
+          docker push "$IMAGE_URI"
+          echo "image_uri=$IMAGE_URI" >> "$GITHUB_OUTPUT"
+
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
+
+      - name: Deploy to EKS
+        run: |
+          cd ${{ env.SERVICE_DIR }}/k8s
+          # Substitute the freshly-built image into deployment.yaml, then apply
+          sed -i "s|image: .*|image: ${{ steps.build.outputs.image_uri }}|" deployment.yaml
+          kubectl apply -k .
+          kubectl rollout status deployment/analytics -n ihp --timeout=120s

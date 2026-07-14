@@ -1,0 +1,54 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ihp_admin
+      POSTGRES_PASSWORD: devpassword
+      POSTGRES_DB: postgres # default db; ihp_auth/ihp_analytics created by init script below
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./infra/local/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ihp_admin"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  auth:
+    build: ./services/auth
+    ports:
+      - "8001:8000"
+    environment:
+      DB_HOST: postgres
+      DB_USER: ihp_admin
+      DB_PASSWORD: devpassword
+      DB_NAME: ihp_auth
+      JWT_SECRET: local-dev-secret-do-not-use-in-prod
+    volumes:
+      - ./services/auth/app:/app/app # bind mount for hot reload
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  analytics:
+    build: ./services/analytics
+    ports:
+      - "8002:8000"
+    environment:
+      DB_HOST: postgres
+      DB_USER: ihp_admin
+      DB_PASSWORD: devpassword
+      DB_NAME: ihp_analytics
+      JWT_SECRET: local-dev-secret-do-not-use-in-prod # must match auth's JWT_SECRET
+    volumes:
+      - ./services/analytics/app:/app/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pg_data:
