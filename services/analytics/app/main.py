@@ -24,3 +24,4 @@ app.include_router(dashboard.router, prefix="/api/v1/dashboard", tags=["dashboar
 def healthz():
     """Liveness/readiness probe target for the K8s deployment."""
     return {"status": "ok", "service": "analytics"}
+    
