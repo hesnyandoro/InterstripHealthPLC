@@ -1,4 +1,4 @@
-# Interstrip Health PLC — Platform Monorepo and Architecture
+# Interstrip Health PLC — Platform Monorepo Architecture
 
 Microservices architecture, one repo, independently deployed services on EKS.
 See `infra/terraform` for cluster/DB provisioning and `services/<name>/k8s` for
