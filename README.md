@@ -64,7 +64,7 @@ curl http://localhost:8002/api/v1/dashboard/facilities \
 ```
 
 Both services must share the same `JWT_SECRET` — docker-compose.yml already sets
-the same value for both; keep them in sync if you change it.
+the same value for both; keep them in sync if you change it. Must
 
 ## Adding a new microservice
 
