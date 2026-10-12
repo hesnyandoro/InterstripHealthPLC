@@ -76,3 +76,5 @@ the same value for both; keep them in sync if you change it. Must
 ## Required GitHub secrets
 
 - `AWS_DEPLOY_ROLE_ARN` — an IAM role GitHub Actions assumes via OIDC (no static AWS keys in the repo)
+- CI/CD
+- 
