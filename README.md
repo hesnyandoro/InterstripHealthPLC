@@ -10,7 +10,7 @@ each service's own manifests.
 infra/terraform/       VPC, EKS cluster, ECR repos, per-service RDS instances
 infra/k8s/base/        Cluster-wide manifests (namespace, ingress controller, etc.)
 services/analytics/    FastAPI service — hospital dashboards (first service built)
-services/<other>/      claimguard, medsource, envihealth, auth, gateway — scaffold as they're built
+services/<other>/      claimguard, medsource, envihealth, auth, gateway — scaffolded as they're built
 apps/web-marketing/    Next.js public site (deployed separately to Vercel)
 .github/workflows/     One path-filtered workflow per service
 ```
