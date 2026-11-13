@@ -71,7 +71,7 @@ the same value for both; keep them in sync if you change it. Must
 1. Copy `services/analytics` as a starting template (Dockerfile + k8s/ pattern)
 2. Add its name to `service_names` in `infra/terraform/variables.tf` → `terraform apply` creates its ECR repo
 3. Copy `infra/terraform/rds-analytics.tf` → `rds-<service>.tf` if it needs its own database
-4. Copy `.github/workflows/analytics.yml`, rename, update `ECR_REPOSITORY`/`SERVICE_DIR`/paths filter
+4. Copy `.github/workflows/analytics.yml`, rename, and update `ECR_REPOSITORY`/`SERVICE_DIR`/paths filter
 
 ## Required GitHub secrets
 
@@ -80,4 +80,8 @@ the same value for both; keep them in sync if you change it. Must
 - Terraform
 - Kafka
 - docker
+<<<<<<< HEAD
 -langchain
+=======
+- 
+>>>>>>> bb8de8d7feab96f099660f7ff4da3ccde91bc40f
