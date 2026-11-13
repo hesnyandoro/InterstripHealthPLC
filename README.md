@@ -80,3 +80,4 @@ the same value for both; keep them in sync if you change it. Must
 - Terraform
 - Kafka
 - docker
+-langchain
